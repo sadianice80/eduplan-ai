@@ -24,7 +24,7 @@ if st.button("✨ Generate Lesson Plan & Quiz"):
         try:
             genai.configure(api_key=api_key)
             # 2.0 Flash is lightweight and has high free quotas
-            model = genai.GenerativeModel('gemini-1.5-flash-8b')
+            model = genai.GenerativeModel('gemini-1.5-flash')
             
             prompt = f"Create a structured lesson plan and a short 5-question quiz for {subject} on topic '{topic}' for {grade} students. Duration: {duration} minutes."
             
