@@ -3,84 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduPlan AI — Lesson Plan & Quiz Generator</title>
-    <!-- Bootstrap CSS -->
+    <title>EduPlan AI Ultimate — All-in-One Teacher Suite</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .card { border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: none; }
-        .btn-primary { background-color: #0d6efd; border: none; font-weight: 600; }
-        .output-box { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 8px; white-space: pre-wrap; font-family: monospace; font-size: 0.95rem; }
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+        
+        .main-card { 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: #ffffff;
+            color: #1e293b;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 35px 20px;
+            text-align: center;
+        }
+
+        .form-label { font-weight: 600; color: #334155; }
+        .form-control, .form-select { border-radius: 10px; border: 1px solid #cbd5e1; padding: 12px 15px; }
+        .form-control:focus, .form-select:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); border-color: #2563eb; }
+
+        .btn-generate { 
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 700; 
+            padding: 14px; 
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); }
+
+        .output-box { 
+            background-color: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-top: 25px;
+            white-space: pre-wrap; 
+            font-family: 'Georgia', serif; 
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #0f172a;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+            flex-direction: column;
+            color: white;
+        }
+
+        @media print {
+            body { background: white; color: black; }
+            .main-card { box-shadow: none; border: none; }
+            .header-section, .input-form-group, .action-buttons, #loadingOverlay { display: none !important; }
+            .output-box { border: none; padding: 0; margin: 0; }
+        }
     </style>
 </head>
-<body class="py-5">
-    <div class="container" style="max-width: 750px;">
-        <div class="card p-4 p-md-5">
-            <h2 class="text-center fw-bold mb-1">📚 EduPlan AI</h2>
-            <p class="text-center text-muted mb-4">Lesson Plan & Quiz Generator for Teachers</p>
+<body class="py-4 py-md-5">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
+        <h4 class="mt-4 fw-bold">EduPlan AI is generating your materials...</h4>
+        <p class="text-light opacity-75">Designing Lesson Plan, Quiz, Homework & Rubric</p>
+    </div>
+
+    <div class="container" style="max-width: 900px;">
+        <div class="card main-card">
             
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Google Gemini API Key</label>
-                <input type="password" id="apiKey" class="form-control" placeholder="AIzaSy...">
+            <!-- Header -->
+            <div class="header-section">
+                <h1 class="fw-bold mb-1"><i class="fas fa-graduation-cap me-2"></i>EduPlan AI Ultimate</h1>
+                <p class="lead mb-0 opacity-90">All-in-One AI Suite for Modern Educators</p>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                
+                <div class="input-form-group">
+                    <!-- API Key Input -->
+                    <div class="mb-4">
+                        <label class="form-label"><i class="fas fa-key me-2 text-primary"></i>Google Gemini API Key</label>
+                        <input type="password" id="apiKey" class="form-control" placeholder="Paste your Gemini API Key here">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Subject</label>
+                            <input type="text" id="subject" class="form-control" placeholder="e.g. Science, English, Mathematics">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Topic</label>
+                            <input type="text" id="topic" class="form-control" placeholder="e.g. Photosynthesis, Nouns, Algebra">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Grade Level</label>
+                            <select id="grade" class="form-select">
+                                <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+                                <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+                                <option>Grade 7</option><option>Grade 8</option><option>High School</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Duration (Mins)</label>
+                            <input type="number" id="duration" class="form-control" value="40" min="10" max="180">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Teaching Style</label>
+                            <select id="style" class="form-select">
+                                <option value="Interactive & Activity-Based">Interactive</option>
+                                <option value="Direct Instruction & Lecture">Lecture</option>
+                                <option value="Group Work & Discussion">Group Work</option>
+                                <option value="Inquiry-Based Learning">Inquiry</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- NEW FEATURES INPUTS -->
+                    <div class="row">
+                        <!-- Language Option -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-language me-1 text-primary"></i> Output Language</label>
+                            <select id="language" class="form-select">
+                                <option value="English">English</option>
+                                <option value="Urdu (in Urdu Script)">Urdu (اردو)</option>
+                                <option value="Roman Urdu">Roman Urdu</option>
+                            </select>
+                        </div>
+                        <!-- Additional Components Checklist -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-plus-circle me-1 text-primary"></i> Include Additional Extras</label>
+                            <div class="d-flex gap-3 pt-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="incHomework" checked>
+                                    <label class="form-check-label" for="incHomework">Homework</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="incRubric" checked>
+                                    <label class="form-check-label" for="incRubric">Evaluation Rubric</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="generatePlan()" class="btn btn-primary btn-generate w-100 text-white mt-3" id="genBtn">
+                        <i class="fas fa-magic me-2"></i>Generate Complete Suite
+                    </button>
+                </div>
+
+                <!-- Output Area -->
+                <div id="outputArea" class="d-none">
+                    <div id="output" class="output-box"></div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button onclick="copyToClipboard()" class="btn btn-outline-dark btn-sm">
+                            <i class="fas fa-copy me-1"></i> Copy Content
+                        </button>
+                        <button onclick="window.print()" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-print me-1"></i> Print / Save PDF
+                        </button>
+                        <button onclick="downloadPlan('doc')" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-file-word me-1"></i> Download Word (.doc)
+                        </button>
+                        <button onclick="shareWhatsApp()" class="btn btn-success btn-sm">
+                            <i class="fab fa-whatsapp me-1"></i> Share WhatsApp
+                        </button>
+                    </div>
+                </div>
+
             </div>
             
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold">Subject</label>
-                    <input type="text" id="subject" class="form-control" placeholder="e.g. English, Math">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold">Topic</label>
-                    <input type="text" id="topic" class="form-control" placeholder="e.g. Nouns, Fractions">
-                </div>
+            <div class="card-footer text-center text-muted py-3 bg-light border-0">
+                Crafted for Teachers | Powered by Google Gemini AI
             </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold">Grade Level</label>
-                    <select id="grade" class="form-select">
-                        <option>Grade 1</option><option>Grade 2</option>
-                        <option>Grade 3</option><option>Grade 4</option>
-                        <option>Grade 5</option><option>Grade 6</option>
-                        <option>Grade 7</option><option>Grade 8</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold">Duration (Minutes)</label>
-                    <input type="number" id="duration" class="form-control" value="40">
-                </div>
-            </div>
-
-            <button onclick="generatePlan()" class="btn btn-primary w-100 py-2 mt-3" id="genBtn">✨ Generate Lesson Plan & Quiz</button>
-
-            <div id="output" class="mt-4 p-3 output-box d-none"></div>
         </div>
     </div>
 
+    <!-- Script -->
     <script>
+        let generatedPlanText = "";
+
         async function generatePlan() {
             const apiKey = document.getElementById('apiKey').value.trim();
             const subject = document.getElementById('subject').value.trim();
             const topic = document.getElementById('topic').value.trim();
             const grade = document.getElementById('grade').value;
             const duration = document.getElementById('duration').value;
+            const style = document.getElementById('style').value;
+            const language = document.getElementById('language').value;
+            const incHomework = document.getElementById('incHomework').checked;
+            const incRubric = document.getElementById('incRubric').checked;
+
+            const outputArea = document.getElementById('outputArea');
             const output = document.getElementById('output');
-            const genBtn = document.getElementById('genBtn');
+            const loading = document.getElementById('loadingOverlay');
 
             if (!apiKey || !subject || !topic) {
-                alert("براہ کرم API Key، Subject اور Topic تمام خانے پر کریں۔");
+                alert("Please fill in API Key, Subject, and Topic!");
                 return;
             }
 
-            genBtn.innerText = "Generating... Please wait";
-            genBtn.disabled = true;
-            output.classList.add('d-none');
+            loading.style.display = 'flex';
+            outputArea.classList.add('d-none');
 
-            const prompt = `Create a detailed and structured lesson plan along with a 5-question quiz with answers for:
+            let extrasPrompt = "";
+            if (incHomework) extrasPrompt += "\n- Creative Homework Assignment for students";
+            if (incRubric) extrasPrompt += "\n- A simple Evaluation/Grading Rubric for assessing student work";
+
+            const prompt = `Act as an expert educational consultant and teacher trainer. Create a comprehensive, well-formatted teaching suite in ${language} for:
 Subject: ${subject}
 Topic: ${topic}
 Grade: ${grade}
-Duration: ${duration} minutes.`;
+Duration: ${duration} minutes
+Teaching Approach: ${style}
+
+Structure the output with bold headers:
+1. Learning Objectives (Bloom's Taxonomy)
+2. Required Teaching Materials
+3. Key Vocabulary
+4. Detailed Lesson Procedure (Hook/Intro, Direct Instruction, Guided Practice, Independent Activity, Conclusion)
+5. Assessment / 5-Question Quiz with Answer Key ${extrasPrompt}`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
@@ -94,19 +264,46 @@ Duration: ${duration} minutes.`;
                 const data = await response.json();
                 
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    output.innerText = data.candidates[0].content.parts[0].text;
-                    output.classList.remove('d-none');
+                    generatedPlanText = data.candidates[0].content.parts[0].text;
+                    output.innerText = generatedPlanText;
+                    outputArea.classList.remove('d-none');
                 } else if (data.error) {
-                    alert("Error: " + data.error.message);
+                    alert("Gemini AI Error: " + data.error.message);
                 } else {
-                    alert("ایپلی کیشن سے کوئی جواب موصول نہیں ہوا۔");
+                    alert("Unknown error occurred.");
                 }
             } catch (err) {
-                alert("کنکشن کی خرابی: " + err.message);
+                alert("Connection Failed: " + err.message);
             } finally {
-                genBtn.innerText = "✨ Generate Lesson Plan & Quiz";
-                genBtn.disabled = false;
+                loading.style.display = 'none';
             }
+        }
+
+        function copyToClipboard() {
+            if (!generatedPlanText) return;
+            navigator.clipboard.writeText(generatedPlanText);
+            alert("Copied to clipboard!");
+        }
+
+        function downloadPlan(format) {
+            if (!generatedPlanText) return;
+            const subject = document.getElementById('subject').value || "Lesson";
+            const topic = document.getElementById('topic').value || "Plan";
+            const filename = `${subject}_${topic}_EduPlan.${format}`;
+            
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:application/msword;charset=utf-8,' + encodeURIComponent(generatedPlanText));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function shareWhatsApp() {
+            if (!generatedPlanText) return;
+            const url = `https://wa.me/?text=${encodeURIComponent("*EduPlan AI Suite*\n\n" + generatedPlanText)}`;
+            window.open(url, '_blank');
         }
     </script>
 </body>
