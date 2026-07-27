@@ -114,7 +114,7 @@ if st.button("✨ Generate Complete Teaching Suite", type="primary", use_contain
         with st.spinner("⏳ EduPlan AI is generating your lesson plan, quiz, homework, and rubric..."):
             try:
                 genai.configure(api_key=api_key, transport="rest")
-                model = genai.GenerativeModel("gemini-1.5-flash")
+                model = genai.GenerativeModel("gemini-2.0-flash")
                 response = model.generate_content(prompt)
 
                 if response.text:
