@@ -76,11 +76,9 @@ Structure the output with clear bold headers:
         with st.spinner("⏳ EduPlan AI is generating your lesson plan, quiz, homework, and rubric..."):
             try:
                genai.configure(api_key=api_key, transport="rest")
-                
                 # Using Gemini 1.5 Flash for high speed and reliable output
                 model = genai.GenerativeModel('gemini-1.5-flash')
                 response = model.generate_content(prompt)
-
                 if response.text:
                     st.success("🎉 Teaching Suite Generated Successfully!")
                     
